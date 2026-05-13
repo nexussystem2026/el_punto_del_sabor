@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Punto del Sabor | Auténticos Sabores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --jr-red: #FC1216;
+            --jr-colombia: #E8B83F;
+            --jr-black: #1a1a1a;
+            --jr-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            transition: background-color 0.4s ease;
+        }
+
+        h1, h2, h3, .font-oswald {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* --- AJUSTE VIDEO DE FONDO Y MARGEN --- */
+        .hero-video-container {
+            position: relative;
+            min-height: 120vh; /* Margen extra hacia abajo */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        /* Ajuste para móviles */
+        @media (max-width: 768px) {
+            .hero-video-container {
+                min-height: 100vh !important;
+                height: -webkit-fill-available;
+            }
+        }
+
+        .header-shadow { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .card-menu { 
+            transition: all 0.3s ease; 
+            border: 1px solid #e5e7eb; 
+            background-color: white; 
+            color: black; 
+        }
+        
+        .card-menu:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        }
+
+        .btn-jr { 
+            background-color: #BC1E21; 
+            color: white; 
+            font-weight: 900; 
+            transition: all 0.2s; 
+        }
+
+        .btn-jr:hover {
+            background-color: var(--jr-black);
+            transform: scale(1.02);
+        }
+
+        .nav-link { 
+            position: relative; 
+            font-weight: 700; 
+            color: var(--jr-white); 
+            font-size: 0.9rem; 
+        }
+
+        .nav-link::after { 
+            content: ""; 
+            position: absolute; 
+            width: 0; 
+            height: 3px; 
+            bottom: -5px; 
+            left: 0; 
+            background-color: #BC1E21; 
+            transition: width 0.3s; 
+        }
+
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        .theme-inicio { background-color: #FC1216; color: white; }
+        .theme-menu { background-color: #1a1a1a; color: white; }
+        .theme-colombia { background-color: #E8B83F; color: black; }
+        .theme-pasteleria { background-color: #FFFFFF; color: black; }
+
+        .hidden-page { display: none; }
+        
+        #cart-sidebar { 
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 100; 
+        }
+
+        .social-btn { 
+            width: 50px; 
+            height: 50px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%; 
+            font-size: 1.5rem; 
+            transition: all 0.3s ease; 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+        }
+
+        .modal-scroll::-webkit-scrollbar { width: 4px; }
+        .modal-scroll::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
+    </style>
+</head>
+
+<body id="main-body" class="theme-inicio">
+    <header class="bg-[#FC1216] sticky top-0 z-40 header-shadow">
+        <div class="max-w-7xl mx-auto px-4 h-24 flex justify-between items-center">
+            <div onclick="showPage('inicio')" class="cursor-pointer">
+                <img src="logo.png" alt="Logo" class="w-72 h-48 object-contain">
+            </div>
+            
+            <nav class="hidden md:flex space-x-6">
+                <a href="javascript:void(0)" onclick="showPage('inicio')" class="nav-link active uppercase tracking-tighter" id="link-inicio">Inicio</a>
+                <a href="javascript:void(0)" onclick="showPage('menu')" class="nav-link uppercase tracking-tighter" id="link-menu">Comida Rápida</a>
+                <a href="javascript:void(0)" onclick="showPage('colombia')" class="nav-link uppercase tracking-tighter" id="link-colombia">Comida Colombiana</a>
+                <a href="javascript:void(0)" onclick="showPage('pasteleria')" class="nav-link uppercase tracking-tighter" id="link-pasteleria">Pastelería</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleCart()" class="relative bg-[#E8B83F]-600 p-3 rounded-full text-white hover:bg-black transition-colors">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-black text-white text-[9px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">0</span>
+                </button>
+                <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-black z-[60] flex flex-col p-10 space-y-8 text-white">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-red-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <a href="javascript:void(0)" onclick="showPage('inicio'); toggleMobileMenu()" class="text-2xl font-white uppercase italic">Inicio</a>
+        <a href="javascript:void(0)" onclick="showPage('menu'); toggleMobileMenu()" class="text-2xl font-black uppercase italic">Comida Rápida</a>
+        <a href="javascript:void(0)" onclick="showPage('colombia'); toggleMobileMenu()" class="text-2xl font-black uppercase italic">Comida Colombiana</a>
+        <a href="javascript:void(0)" onclick="showPage('pasteleria'); toggleMobileMenu()" class="text-2xl font-black uppercase italic">Pastelería</a>
+    </div>
+
+    <main id="page-inicio">
+        <section class="hero-video-container">
+            <video autoplay muted loop playsinline class="video-bg">
+                <source src="polloasado.mp4" type="video/mp4">
+                <img src="1000093615.jpg" alt="Fondo Brasa">
+            </video>
+            <div class="video-overlay"></div>
+
+            <div class="relative z-20 flex flex-col items-center text-center px-4">
+                <h2 class="text-white text-6xl md:text-9xl font-black italic tracking-tighter mb-6 drop-shadow-2xl uppercase">Sabor de Verdad</h2>
+                <p class="text-white/90 text-xl md:text-3xl font-bold uppercase tracking-[0.2em] mb-10 border-y border-white/40 py-4">El Punto del Sabor en Santiago</p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <button onclick="showPage('menu')" class="bg-[#E8B83F] text-black px-12 py-5 rounded-full font-black uppercase shadow-2xl hover:scale-105 transition-all">Explorar Menú</button>
+                    <button onclick="window.open('https://wa.me/56934338989')" class="bg-green-500 text-white px-12 py-5 rounded-full font-black uppercase shadow-2xl hover:scale-105 transition-all flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp"></i> Pedir Ahora
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-stretch">
+            <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl border border-white/20 text-white flex flex-col justify-center">
+                <h3 class="text-4xl font-black italic mb-8 border-b border-white/20 pb-4">Ubicación y Redes</h3>
+                <div class="space-y-6 mb-10">
+                    <p class="text-lg flex items-center gap-4 font-bold uppercase"><i class="fa-solid fa-location-dot text-2xl"></i> San Diego 835, Santiago Centro</p>
+                    <p class="text-lg flex items-center gap-4 font-bold uppercase"><i class="fa-solid fa-phone text-2xl"></i> +56 9 3433 8989</p>
+                    <p class="text-lg flex items-center gap-4 font-bold uppercase"><i class="fa-solid fa-clock text-2xl"></i> Abierto todos los días</p>
+                </div>
+                <div class="flex gap-6">
+                    <a href="https://www.instagram.com/" target="_blank" class="social-btn"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/" target="_blank" class="social-btn"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="https://wa.me/56934338989" target="_blank" class="social-btn"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="h-[400px] rounded-3xl overflow-hidden border-8 border-black shadow-2xl transform rotate-1">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3328.718423233866!2d-70.652150!3d-33.456641!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662c509a250320f%3A0x6b4904581177651c!2sSan%20Diego%20835%2C%20Santiago%2C%20Regi%C3%B3n%20Metropolitana!5e0!3m2!1ses!2scl!4v1715620000000!5m2!1ses!2scl" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </section>
+    </main>
+
+    <main id="page-menu" class="hidden-page py-16 px-4 max-w-7xl mx-auto">
+        <h2 class="text-5xl font-black text-center italic mb-12 tracking-tighter text-white uppercase">Pollos y Combos</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="grid-rapida"></div>
+    </main>
+
+    <main id="page-colombia" class="hidden-page py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-5xl font-black text-center italic mb-12 tracking-tighter text-black uppercase">Sazón Colombiana</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="grid-colombia"></div>
+        </div>
+    </main>
+
+    <main id="page-pasteleria" class="hidden-page py-16 px-4 max-w-7xl mx-auto">
+        <h2 class="text-5xl font-black text-center italic mb-12 tracking-tighter text-red-700 uppercase">Pastelería</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="grid-pasteleria"></div>
+    </main>
+
+    <div id="product-modal" class="fixed inset-0 bg-black/70 z-[120] hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div id="product-modal-content" class="bg-white rounded-3xl max-w-4xl w-full flex flex-col md:flex-row overflow-hidden relative max-h-[90vh] transform scale-95 transition-transform duration-300">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black z-10 bg-white/90 rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl shadow-sm">×</button>
+            <div class="md:w-1/2 bg-gray-50 flex items-center justify-center p-8 relative">
+                <img id="modal-img" src="" class="w-full h-48 md:h-auto max-h-[350px] object-contain drop-shadow-xl">
+            </div>
+            <div class="md:w-1/2 flex flex-col h-full max-h-[60vh] md:max-h-[85vh]">
+                <div class="p-6 overflow-y-auto flex-grow modal-scroll">
+                    <h3 id="modal-title" class="text-3xl font-black italic uppercase text-black mb-1 leading-none"></h3>
+                    <p id="modal-desc" class="text-gray-500 text-sm mb-4"></p>
+                    <div class="text-red-700 font-black text-2xl mb-8" id="modal-price"></div>
+                    <div>
+                        <div class="flex justify-between items-end mb-4 border-b pb-2">
+                            <h4 class="font-bold text-sm uppercase text-gray-800">¿Desea agregar bebida?</h4>
+                            <span class="text-gray-400 text-[10px] font-bold uppercase tracking-widest bg-gray-100 px-2 py-1 rounded">Opcional</span>
+                        </div>
+                        <div id="modal-addons" class="space-y-3"></div>
+                    </div>
+                </div>
+                <div class="p-6 border-t border-gray-100 bg-gray-50 flex flex-col gap-4 shrink-0">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold uppercase text-xs text-gray-500 tracking-widest">Cantidad:</span>
+                        <div class="flex items-center gap-4 bg-white border border-gray-200 rounded-full px-2 py-1 shadow-sm">
+                            <button onclick="changeModalMainQty(-1)" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center font-bold text-xl">-</button>
+                            <span id="modal-main-qty" class="font-black text-lg w-6 text-center text-black">1</span>
+                            <button onclick="changeModalMainQty(1)" class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center font-bold text-xl">+</button>
+                        </div>
+                    </div>
+                    <button onclick="confirmModalAdd()" class="w-full bg-red-600 hover:bg-black text-white py-4 rounded-xl font-black uppercase tracking-widest transition-colors flex justify-center items-center gap-3">
+                        Agregar <span id="modal-btn-total"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cart-sidebar" class="fixed top-0 right-0 w-full max-w-md h-full bg-white z-[101] translate-x-full shadow-2xl flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="text-2xl font-black italic uppercase text-black">Tu Pedido</h2>
+            <button onclick="toggleCart()" class="p-2 hover:bg-gray-200 rounded-full text-black text-xl">✖</button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4 text-black"></div>
+        <div class="p-8 border-t bg-gray-50 text-black">
+            <div class="flex justify-between items-center mb-6">
+                <span class="font-bold uppercase text-gray-400">Total:</span>
+                <span id="cart-total" class="text-4xl font-black text-red-700 tracking-tighter">$0</span>
+            </div>
+            <select id="order-type" class="w-full mb-4 p-3 border rounded font-bold uppercase text-xs">
+                <option value="Para Llevar">🍗 Para Llevar / Retiro</option>
+                <option value="Servir en Local">🍽️ Servir en Local</option>
+            </select>
+            <button onclick="enviarWhatsApp()" class="btn-jr w-full py-5 rounded-lg text-lg uppercase shadow-lg">Mandar Pedido</button>
+        </div>
+    </div>
+
+    <script>
+        const PRODUCTOS = {
+            rapida: [
+                { id: 1, nombre: "Pollo Entero", precio: 15990, desc: "Asado jugoso, trozado en presas.", img: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=400" },
+                { id: 2, nombre: "1/2 Pollo", precio: 9000, desc: "Incluye trutro y pechuga.", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400" },
+                { id: 3, nombre: "Combo 1", precio: 21500, desc: "Pollo + Papas 400g + Bebida 1.5L", img: "https://images.unsplash.com/photo-1588674488339-4aa8337cd887?w=400" },
+                { id: 4, nombre: "Colación 1/4", precio: 7000, desc: "Pollo + Papas o Arroz.", img: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=400" }
+            ],
+            colombia: [
+                { id: 5, nombre: "Empanadas", precio: 2000, desc: "Crujientes rellenas de sazón.", img: "https://images.unsplash.com/photo-1644976722271-e970b8095b54?w=400" },
+                { id: 6, nombre: "Papa Rellena", precio: 2500, desc: "Fritura tradicional artesanal.", img: "https://images.unsplash.com/photo-1517414986161-002f23bb1d33?w=400" },
+                { id: 7, nombre: "Salchipapa", precio: 6000, desc: "Con chicharrón y salsas.", img: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400" },
+                { id: 8, nombre: "Marranita", precio: 2500, desc: "Plátano relleno de chicharrón.", img: "https://images.unsplash.com/photo-1603048297172-c92544798d5e?w=400" }
+            ],
+            pasteleria: [
+                { id: 9, nombre: "Tres Leches", precio: 2500, desc: "Dulce y tradicional.", img: "https://images.unsplash.com/photo-1551024506-0cb4a1697211?w=400" },
+                { id: 10, nombre: "Beso de Ángel", precio: 2500, desc: "Suave y esponjoso.", img: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400" },
+                { id: 11, nombre: "Chocosamba", precio: 2500, desc: "Placer de chocolate.", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400" }
+            ],
+            bebidas: [
+                { id: 101, nombre: "Bebida Lata", precio: 1200, desc: "350cc", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400" },
+                { id: 102, nombre: "Bebida 1.5 Litros", precio: 2500, desc: "Familiar", img: "https://images.unsplash.com/photo-1527784281694-8de6f5b9d3e5?w=400" },
+                { id: 103, nombre: "Pony Malta", precio: 1800, desc: "Bebida de malta", img: "https://images.unsplash.com/photo-1625772299848-391b6a8731c3?w=400" }
+            ]
+        };
+
+        let carrito = [];
+        let activeModalItem = null;
+        let activeModalQty = 1;
+        let activeAddons = { 101: 0, 102: 0, 103: 0 };
+
+        function showPage(pageId) {
+            document.querySelectorAll('main').forEach(p => p.classList.add('hidden-page'));
+            document.getElementById('page-' + pageId).classList.remove('hidden-page');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            const link = document.getElementById('link-' + pageId);
+            if(link) link.classList.add('active');
+            document.getElementById('main-body').className = 'theme-' + pageId;
+            window.scrollTo(0,0);
+        }
+
+        function render() {
+            const draw = (cat, id) => {
+                const grid = document.getElementById(id);
+                if(!grid) return;
+                grid.innerHTML = PRODUCTOS[cat].map(p => `
+                    <div class="card-menu rounded-xl overflow-hidden flex flex-col h-full">
+                        <div class="h-44 relative overflow-hidden">
+                            <img src="${p.img}" class="w-full h-full object-cover">
+                            <div class="absolute top-2 right-2 bg-red-600 text-white font-black px-3 py-1 rounded text-xs">$${p.precio.toLocaleString()}</div>
+                        </div>
+                        <div class="p-5 flex-grow flex flex-col">
+                            <h4 class="text-xl font-black uppercase italic mb-1">${p.nombre}</h4>
+                            <p class="text-gray-400 text-xs mb-4 flex-grow">${p.desc}</p>
+                            <button onclick="openModal(${p.id}, '${cat}')" class="btn-jr w-full py-3 rounded text-xs uppercase">Agregar +</button>
+                        </div>
+                    </div>
+                `).join('');
+            };
+            draw('rapida', 'grid-rapida');
+            draw('colombia', 'grid-colombia');
+            draw('pasteleria', 'grid-pasteleria');
+        }
+
+        function openModal(id, cat) {
+            activeModalItem = PRODUCTOS[cat].find(x => x.id === id);
+            activeModalQty = 1;
+            activeAddons = { 101: 0, 102: 0, 103: 0 };
+            document.getElementById('modal-img').src = activeModalItem.img;
+            document.getElementById('modal-title').innerText = activeModalItem.nombre;
+            document.getElementById('modal-desc').innerText = activeModalItem.desc;
+            document.getElementById('modal-main-qty').innerText = activeModalQty;
+            renderModalAddons();
+            updateModalPricing();
+            const modal = document.getElementById('product-modal');
+            const content = document.getElementById('product-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('product-modal');
+            const content = document.getElementById('product-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        }
+
+        function renderModalAddons() {
+            const container = document.getElementById('modal-addons');
+            container.innerHTML = PRODUCTOS.bebidas.map(b => `
+                <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div>
+                        <p class="font-bold text-sm uppercase text-gray-800 leading-tight">${b.nombre}</p>
+                        <p class="text-red-600 text-xs font-black mt-1">+$${b.precio.toLocaleString()}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="changeAddonQty(${b.id}, -1)" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold">-</button>
+                        <span class="font-black text-sm w-4 text-center text-black">${activeAddons[b.id]}</span>
+                        <button onclick="changeAddonQty(${b.id}, 1)" class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changeModalMainQty(delta) {
+            if (activeModalQty + delta >= 1) {
+                activeModalQty += delta;
+                document.getElementById('modal-main-qty').innerText = activeModalQty;
+                updateModalPricing();
+            }
+        }
+
+        function changeAddonQty(id, delta) {
+            if (activeAddons[id] + delta >= 0) {
+                activeAddons[id] += delta;
+                renderModalAddons();
+                updateModalPricing();
+            }
+        }
+
+        function updateModalPricing() {
+            const basePrice = activeModalItem.precio * activeModalQty;
+            let addonsPrice = 0;
+            PRODUCTOS.bebidas.forEach(b => { addonsPrice += b.precio * activeAddons[b.id]; });
+            document.getElementById('modal-price').innerText = `$${activeModalItem.precio.toLocaleString()}`;
+            document.getElementById('modal-btn-total').innerText = `$${(basePrice + addonsPrice).toLocaleString()}`;
+        }
+
+        function confirmModalAdd() {
+            const existingMain = carrito.find(x => x.id === activeModalItem.id);
+            if(existingMain) { existingMain.qty += activeModalQty; } 
+            else { carrito.push({...activeModalItem, qty: activeModalQty}); }
+
+            PRODUCTOS.bebidas.forEach(b => {
+                const addQty = activeAddons[b.id];
+                if(addQty > 0) {
+                    const existingAddon = carrito.find(x => x.id === b.id);
+                    if(existingAddon) { existingAddon.qty += addQty; } 
+                    else { carrito.push({...b, qty: addQty}); }
+                }
+            });
+            update();
+            closeModal();
+            if(document.getElementById('cart-sidebar').classList.contains('translate-x-full')) { toggleCart(); }
+        }
+
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('translate-x-full'); }
+        function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+
+        function update() {
+            const container = document.getElementById('cart-items');
+            if(carrito.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 font-bold py-20 uppercase tracking-widest text-sm">Tu carrito está vacío</p>';
+                document.getElementById('cart-total').innerText = '$0';
+                document.getElementById('cart-count').innerText = '0';
+                return;
+            }
+            container.innerHTML = carrito.map(i => `
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div>
+                        <h5 class="font-black text-xs uppercase leading-tight text-black">${i.nombre}</h5>
+                        <p class="text-red-700 font-bold text-sm">${i.qty}x $${(i.precio * i.qty).toLocaleString()}</p>
+                    </div>
+                    <button onclick="carrito=carrito.filter(x=>x.id!=${i.id});update()" class="text-gray-300 hover:text-red-600 p-2 text-xl font-bold">✖</button>
+                </div>
+            `).join('');
+            const total = carrito.reduce((a, b) => a + (b.precio * b.qty), 0);
+            document.getElementById('cart-total').innerText = '$' + total.toLocaleString();
+            document.getElementById('cart-count').innerText = carrito.reduce((a, b) => a + b.qty, 0);
+        }
+
+        function enviarWhatsApp() {
+            if(carrito.length === 0) return;
+            const tipoPedido = document.getElementById('order-type').value;
+            const total = carrito.reduce((a, b) => a + (b.precio * b.qty), 0);
+            let mensaje = `👋 *¡HOLA! EL PUNTO DEL SABOR*%0A`;
+            mensaje += `Quisiera realizar el siguiente pedido:%0A%0A`;
+            mensaje += `──────────────%0A`;
+            mensaje += `📍 *SERVICIO:* ${tipoPedido}%0A`;
+            mensaje += `──────────────%0A%0A`;
+            carrito.forEach((item, index) => {
+                mensaje += `✅ *${index + 1}. ${item.nombre.toUpperCase()}*%0A`;
+                mensaje += `   └ Cantidad: *${item.qty}*%0A`;
+                mensaje += `   └ Subtotal: *$${(item.precio * item.qty).toLocaleString()}*%0A%0A`;
+            });
+            mensaje += `──────────────%0A`;
+            mensaje += `💰 *TOTAL A PAGAR: $${total.toLocaleString()}*%0A`;
+            mensaje += `──────────────%0A%0A`;
+            mensaje += `*Muchas gracias por preferirnos.* 🙏%0A`;
+            mensaje += `_Enviado desde el sitio web oficial._`;
+            const numero = "56934338989";
+            window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank');
+        }
+
+        window.onload = () => { render(); showPage('inicio'); };
+    </script>
+</body>
+</html>
